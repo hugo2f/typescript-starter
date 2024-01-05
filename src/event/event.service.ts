@@ -62,17 +62,15 @@ export class EventService {
       throw new NotFoundException("No users found");
     }
   
-    // Filter out existing invitees
+    // no need to process already invited users
     const newInvitees = users.filter(user => !event.invitees.some(existingInvitee => existingInvitee.id === user.id));
   
-    // Update the event's invitees
+    // add new invitees to event
     event.invitees = event.invitees.concat(newInvitees);
-    // console.log(event.invitees);
     await this.eventRepository.save(event);
   
-    // Update each user's events
+    // each new user is now invited to this event
     await Promise.all(newInvitees.map(async (user) => {
-      // console.log(user.events);
       if (!user.events) user.events = [];
       user.events = [...user.events, event.title];
       await this.userRepository.save(user);
