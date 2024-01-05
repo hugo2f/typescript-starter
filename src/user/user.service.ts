@@ -96,9 +96,10 @@ export class UserService {
 			merged.title += `_${currentEvent.title}`;
 			merged.description += `_${currentEvent.description}`;
 			merged.endTime = currentEvent.endTime;
+
+			// combine invitees from old events
 			currentEvent.invitees.forEach(invitee => {
 				const existingUser = Array.from(new_invitees).find(u => u.name === invitee.name);
-				
 				if (!existingUser) {
 					new_invitees.add(invitee);
 				}
@@ -114,7 +115,6 @@ export class UserService {
 				: EventStatus.TODO;
 
 		this.updateInviteesEvents(events, merged);
-
 		return merged;
 	}
 
@@ -127,8 +127,6 @@ export class UserService {
 		const usersToUpdate: Set<User> = new Set();
 		for (const oldEvent of oldEvents) {
 			for (const invitee of oldEvent.invitees) {
-				// invitee.events = invitee.events.filter((e) => e !== oldEvent.title);
-				// await this.userRepository.save(invitee);
 				usersToUpdate.add(invitee);
 			}
 			await this.eventRepository.delete(oldEvent.id);
